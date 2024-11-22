@@ -15,7 +15,7 @@ import rectangle_img from '@/assets/SVG/Rectangle 5.svg';
 
 <template>
   <ion-page>
-    <ion-content class="bg-amber-300">
+    <ion-content>
       <ion-img :src='img_learning' class="w-3/4 px-4 mx-auto" />
       <div class="grid grid-cols-2 w-full grid-flow-row relative">
 
@@ -59,9 +59,9 @@ import rectangle_img from '@/assets/SVG/Rectangle 5.svg';
           </ion-card-header>
           <ion-card-content>
             <div class="flex flex-wrap-reverse justify-center gap-2">
-              <ion-img :src='ellipse1' class="w-[50px] "/>
+              <ion-img :src='ellipse1' class="w-[50px] " />
               <ion-img :src='rectangle_img' class="w-[50px] " />
-              <ion-img :src='polygon_img' class="w-[50px] "/>
+              <ion-img :src='polygon_img' class="w-[50px] " />
             </div>
           </ion-card-content>
         </ion-card>

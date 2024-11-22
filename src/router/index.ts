@@ -1,23 +1,25 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { RouteRecordRaw } from 'vue-router';
-import layout from '@/layouts/layout.vue';
 import homePage from '@/views/HomePage.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    redirect: { name: 'home' },
+    name: 'Splash',
+    component: () => import('@/views/SplashScreenPage.vue'),
+    meta: {
+      noAuth: true,
+    },
   },
   {
-    path: '/',
-    component: layout,
-    children: [
-      {
-        path: '/home',
-        name: 'home',
-        component: homePage,
-      },
-    ],
+    path:'/inial-data',
+    name:'initial-data',
+    component: () => import('@/views/InitialDataPage.vue')
+  },
+  {
+    path:'/home',
+    name: 'home',
+    component: homePage,
   },
 ];
 

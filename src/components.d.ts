@@ -8,6 +8,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AppHeader: typeof import('./components/AppHeader.vue')['default']
+    IonButton: typeof import('@ionic/vue')['IonButton']
     IonButtons: typeof import('@ionic/vue')['IonButtons']
     IonCard: typeof import('@ionic/vue')['IonCard']
     IonCardContent: typeof import('@ionic/vue')['IonCardContent']
@@ -15,14 +16,20 @@ declare module 'vue' {
     IonCardTitle: typeof import('@ionic/vue')['IonCardTitle']
     IonContent: typeof import('@ionic/vue')['IonContent']
     IonHeader: typeof import('@ionic/vue')['IonHeader']
+    IonIcon: typeof import('@ionic/vue')['IonIcon']
     IonImg: typeof import('@ionic/vue')['IonImg']
+    IonInput: typeof import('@ionic/vue')['IonInput']
+    IonItem: typeof import('@ionic/vue')['IonItem']
+    IonLabel: typeof import('@ionic/vue')['IonLabel']
     IonMenu: typeof import('@ionic/vue')['IonMenu']
     IonMenuButton: typeof import('@ionic/vue')['IonMenuButton']
     IonPage: typeof import('@ionic/vue')['IonPage']
     IonRouterOutlet: typeof import('@ionic/vue')['IonRouterOutlet']
     IonTitle: typeof import('@ionic/vue')['IonTitle']
     IonToolbar: typeof import('@ionic/vue')['IonToolbar']
+    RegisterData: typeof import('./components/initialData/registerData.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SplashScreen: typeof import('./components/splashScreen/SplashScreen.vue')['default']
   }
 }

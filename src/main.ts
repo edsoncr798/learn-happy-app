@@ -33,6 +33,7 @@ import '@ionic/vue/css/display.css';
 
 /* Theme variables */
 import './theme/style.css';
+import './modules/firebaseConfig'
 
 const app = createApp(App)
   .use(IonicVue)

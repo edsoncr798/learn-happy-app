@@ -1,6 +1,10 @@
 @import "./tailwind.css";
 @import "./variables.css";
 
+body{
+  font-family: 'Amethysta', sans-serif;
+}
+
 .atkinson-hyperlegible-regular {
   font-family: "Atkinson Hyperlegible", sans-serif;
   font-weight: 400;

@@ -6,7 +6,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        'sans': ['Atkinson Hyperlegible', 'sans-serif'],
+        'sans': ['Amethysta', 'sans-serif'],
       }
     },
   },
