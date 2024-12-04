@@ -67,7 +67,7 @@ const goToBack = () => {
       }"
           :class="`game-${level}`"
           class="bg-[#FF0000FF] w-[90px] h-[90px] rounded-[50%] text-[30px] text-white font-black"
-          @click="goToGame(level)"
+          @click="goToGame()"
         >
           {{ level }}
         </ion-button>

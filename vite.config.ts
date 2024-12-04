@@ -32,4 +32,16 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Dividir librerías externas en chunks separados
+          vue: ['vue', 'vue-router'],
+          firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore'],
+        },
+      },
+    },
+    // outDir: "../my-app/dist",
+  },
 });
