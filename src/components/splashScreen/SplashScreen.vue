@@ -1,12 +1,20 @@
 <script setup lang="ts">
 import logoApp from '@/assets/SVG/aprendamos.svg'
 import palms from '@/assets/SVG/palmas.svg'
+import profileStore from '@/components/auth/profile/profile.store';
 
 const router = useRouter();
 
-onMounted(() =>{
+onMounted( () => {
   setTimeout(() =>{
-    router.push('/inial-data');
+    const user = localStorage.getItem('user');
+    if(user){
+      const parseUser = JSON.parse(user);
+      profileStore.setUser(parseUser);
+      router.push({name: 'Welcome'})
+    }else{
+      router.push({ name: 'initial-data' });
+    }
   }, 3000)
 })
 
@@ -14,7 +22,7 @@ onMounted(() =>{
 
 <template>
   <ion-content>
-    <div class="relative w-full h-full bg-[#FBFFD9] flex justify-center ion-text-center">
+    <div class="relative w-full h-full background-container flex justify-center ion-text-center">
       <ion-img
         class="animate-pulse w-[300px]"
         :src="logoApp"

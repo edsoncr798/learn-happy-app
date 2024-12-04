@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { IonApp, IonRouterOutlet } from '@ionic/vue';
+import profileStore, { IUser } from '@/components/auth/profile/profile.store';
 
-// onMounted(async () => {
-//   await useInitialData().getInitialData();
-//   isMounted.value = true;
-// });
+onMounted(async () => {
+  const user = localStorage.getItem('user');
+  profileStore.setUser(user ? JSON.parse(user) : {} as IUser);
+});
 
 </script>
 

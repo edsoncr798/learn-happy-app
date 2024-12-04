@@ -4,7 +4,11 @@
 
 <template>
   <ion-page>
-    <home-app/>
+    profile page
   </ion-page>
+
 </template>
 
+<style scoped>
+
+</style>
