@@ -1,53 +1,53 @@
 <script setup lang="ts">
 import profileStore from '@/components/auth/profile/profile.store';
+import { IGame } from '@/models/interfaces';
+import getGames from '@/components/games/actions/getGames';
 import { toastController } from '@ionic/vue';
-// import levelsData from '@/data/games.json'
+import getLevelById from '@/components/gameLevels/actions/getLevelById';
 
-const router = useRouter();
+
 const route = useRoute();
+const router = useRouter();
 
-const levelNumber = computed(() => parseInt(route.params.levelNumber as string, 10));
 const userName = computed(() => profileStore.getUserName());
+const levelId = route.params.levelId as string;
+const levelNumber = ref<number | null>(null);
+const games = ref<IGame[]>([]);
 
-//datos dinamicos del Json
+onMounted(async () => {
+  games.value = await getGames(levelId);
+  console.log('juegos obtenidos', games.value);
 
+  const level = await getLevelById(levelId);
+  if (level) {
+    levelNumber.value = level.levelNumber;
+    console.log('nivel actual', levelNumber.value);
+  }
 
-// Niveles totales
-const totalLevels = 15;
-
-
-// Nivel actual (representa el nivel alcanzado por el jugador)
-const currentLevel = ref(1);
-
-// Calcular el grupo de niveles visibles (de 5 en 5)
-const currentGroupStart = computed(() => Math.floor((currentLevel.value - 1) / 5) * 5 + 1);
-const visibleLevels = computed(() => {
-  const start = currentGroupStart.value;
-  const end = Math.min(start + 4, totalLevels); // Asegurar que no pase del total
-  return Array.from({ length: end - start + 1 }, (_, i) => start + i);
 });
 
-const goToGame = () => {
-  // if (gameId <= currentLevel.value) {
-  //   router.push({
-  //     name: 'Game',
-  //     params: { levelNumber: levelNumber.value, gameId },
-  //   });
-  //   console.log('hola');
-  // }
-  toastController
-    .create({
-      message: `hola ${userName.value}, en estos momentos trabajamos en la vista de los juegos`,
-      color: 'secondary',
-      duration: 2000,
-      position: 'middle',
-    })
-    .then((toast) => toast.present());
+
+const goToGame = async (game: IGame) => {
+  if (game.unlocked) {
+    localStorage.setItem('selectedGame', JSON.stringify(game));
+    await router.push({
+      name: 'Games',
+      params: { gameId: game.uid },
+    });
+  } else {
+    toastController
+      .create({
+        message: 'juego bloqueado',
+        duration: 2000,
+        color: 'warning',
+      })
+      .then((toast) => toast.present());
+  }
 };
 
 
 const goToBack = () => {
-  router.push({ name: 'game-levels' });
+  router.push({ name: 'Levels' });
 };
 
 </script>
@@ -56,20 +56,20 @@ const goToBack = () => {
   <ion-content>
     <div class="background-levels w-full h-full relative">
       <ion-card color="success" class="font-mono font-black w-[60%] absolute top-0 left-0 p-2 text-xl">Nivel:
-        {{ levelNumber }} <br> Jugador: {{ userName }}
+        {{ levelNumber || 'Cargando...' }} <br> Jugador: {{ userName }}
       </ion-card>
       <div class="btn-games-container">
         <ion-button
           fill="clear"
-          v-for="level in visibleLevels" :key="level"
+          v-for="(game, index) in games" :key="game.uid"
           :style="{
-        backgroundColor: level > currentLevel ? 'gray' : 'red'
+        backgroundColor: game.unlocked ? 'red' : 'gray'
       }"
-          :class="`game-${level}`"
+          :class="`game-${index + 1}`"
           class="bg-[#FF0000FF] w-[90px] h-[90px] rounded-[50%] text-[30px] text-white font-black"
-          @click="goToGame()"
+          @click="goToGame(game)"
         >
-          {{ level }}
+          {{ index + 1 }}
         </ion-button>
 
       </div>

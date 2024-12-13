@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import logoApp from '@/assets/SVG/aprendamos.svg';
 import child from '@/assets/SVG/niño 1.svg';
-import { IUser } from '@/components/auth/profile/profile.store';
 import genderMan from '@/assets/SVG/gender-man.svg';
 import genderWoman from '@/assets/SVG/gender-woman.svg';
 import registerUser from '@/components/auth/actions/registerUser';
 import { toastController } from '@ionic/vue';
+import { IUser } from '@/models/interfaces';
 
 const router = useRouter();
 const isLoadingButton = ref(false);
@@ -45,7 +45,7 @@ const saveInitialData = async () => {
   isLoadingButton.value = true;
   await registerUser(initialData.value);
   isLoadingButton.value = false;
-  await router.push({ name: 'Welcome' });
+  await router.push({ name: 'Home' });
 };
 
 </script>
@@ -89,6 +89,7 @@ const saveInitialData = async () => {
                 <ion-button
                   size="large"
                   expand="full"
+                  aria-selected="true"
                   fill="default"
                   class="border-2 border-[#1461eb]"
                   @click="selectGender('Niño')"
@@ -99,6 +100,7 @@ const saveInitialData = async () => {
                 <ion-button
                   size="large"
                   expand="full"
+                  aria-selected="true"
                   fill="default"
                   class="border-2 border-[#1461eb]"
                   @click="selectGender('Niña')"

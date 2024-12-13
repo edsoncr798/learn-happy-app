@@ -1,14 +1,9 @@
-<script setup lang="ts">
-
-</script>
 
 <template>
   <ion-page>
-    profile page
+    <profile-form/>
   </ion-page>
-
 </template>
-
-<style scoped>
-
-</style>
+<script setup lang="ts">
+import ProfileForm from '@/components/auth/profile/components/profileForm.vue';
+</script>

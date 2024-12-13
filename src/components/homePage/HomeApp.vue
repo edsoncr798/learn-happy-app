@@ -5,7 +5,7 @@ import img_palmas from '@/assets/SVG/palmas.svg';
 const router = useRouter();
 
 const goToGame = () => {
-  router.push({ name: 'game-levels' });
+  router.push({ name: 'Levels' });
 };
 
 const goToProgress = () => {

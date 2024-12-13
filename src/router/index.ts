@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { RouteRecordRaw } from 'vue-router';
 import homePage from '@/views/HomePage.vue';
-import NumberLevels from '@/views/NumberGamesLevelPage.vue';
-import Game from '@/views/GamePage.vue';
+import LevelGames from '@/views/NumberGamesLevelPage.vue';
+import Games from '@/views/GamePage.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -31,11 +31,6 @@ const routes: Array<RouteRecordRaw> = [
     component: homePage,
   },
   {
-    path: '/game-levels',
-    name: 'game-levels',
-    component: () => import('@/views/GameLevelsPage.vue'),
-  },
-  {
     path: '/progress',
     name: 'Progress',
     component: () => import('@/views/ProgressPage.vue'),
@@ -46,18 +41,21 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/views/ProfilePage.vue'),
   },
   {
-    path: '/level/:levelNumber',
-    name: 'NumberLevels',
-    component: NumberLevels,
-    props: true,
-    children: [
-      {
-        path: 'game/:gameId',
-        name: 'Game',
-        component: Game,
-      },
-    ],
+    path: '/levels',
+    name: 'Levels',
+    component: () => import('@/views/GameLevelsPage.vue'),
   },
+  {
+    path: '/level/:levelId',
+    name: 'LevelsGames',
+    component: LevelGames,
+    props: true,
+  },
+  {
+    path: '/level/:levelId/game/:gameId',
+    name: 'Games',
+    component: Games,
+  }
 ];
 
 const router = createRouter({

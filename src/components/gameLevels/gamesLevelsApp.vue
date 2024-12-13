@@ -2,20 +2,38 @@
 import img_learning from '@/assets/SVG/aprendamos.svg';
 import img_palms from '@/assets/SVG/palmas.svg';
 import lock_closed from '@/assets/SVG/unlocked.svg';
-import gamesStore from '@/components/gameLevels/gameLevels.store';
 import { toastController } from '@ionic/vue';
+import { ILevel } from '@/models/interfaces';
+import gameLevelsStore from '@/components/gameLevels/gameLevels.store';
+import getLevels from '@/components/gameLevels/actions/getLevels';
+import GameLevelsSkeleton from '@/components/gameLevels/gameLevelsSkeleton.vue';
 
 const router = useRouter();
-const levels = computed(() => gamesStore.getLevels());
+const levels = computed(() => gameLevelsStore.getLevels());
+const isLoading = ref(false);
 
-const navigateToLevel = (level: { number: number; isUnlocked: boolean }) => {
-  if (level.isUnlocked) {
-    router.push({ name: 'NumberLevels', params: { levelNumber: level.number } });
+const requestData = async () => {
+  isLoading.value = true;
+  await getLevels();
+  isLoading.value = false;
+}
+
+onMounted(async () => {
+   await requestData();
+});
+
+
+const goToLevelGames = async (level: ILevel) => {
+  if (level.is_unlocked) {
+    await router.push({
+      name: 'LevelsGames',
+      params: { levelId: level.uid },
+    });
   } else {
     toastController
       .create({
         message: 'nivel bloqueado',
-        duration: 3000,
+        duration: 2000,
         color: 'warning',
       })
       .then((toast) => toast.present());
@@ -23,32 +41,33 @@ const navigateToLevel = (level: { number: number; isUnlocked: boolean }) => {
 };
 
 
-const goToBack = () =>{
-  router.push({name: 'Home'});
-}
+const goToBack = () => {
+  router.push({ name: 'Home' });
+};
 </script>
 
 <template>
-  <ion-content>
+ <game-levels-skeleton v-if="isLoading"/>
+  <ion-content v-else>
     <div class="w-full h-full flex flex-col justify-between items-center background-container relative">
       <ion-img :src="img_learning" class="w-[200px]" />
       <div class="grid -mt-8 grid-cols-2 px-8 w-full grid-flow-row">
         <ion-card
           v-for="level in levels"
-          :key="level.number"
+          :key="level.uid"
           class="text-2xl font-black p-2 bg-[#C9F6F5] relative"
-          @click="navigateToLevel(level)"
+          @click="goToLevelGames(level)"
         >
           <div
             :class="{
-              'blur-[2px] cursor-not-allowed': !level.isUnlocked,
+              'blur-[2px] cursor-not-allowed': !level.is_unlocked,
             }"
             class="text-center text-black"
           >
             Nivel <br>
-            {{ level.number }}
+            {{ level.levelNumber }}
           </div>
-          <ion-img v-if="!level.isUnlocked" :src="lock_closed"
+          <ion-img v-if="!level.is_unlocked" :src="lock_closed"
                    class="w-1/2 absolute left-[50%] -translate-x-1/2 -translate-y-1/2 top-1/2" />
         </ion-card>
       </div>

@@ -1,6 +1,6 @@
 import { getFirestore, collection, doc, getDoc } from 'firebase/firestore';
-import { IUser } from '@/components/auth/profile/profile.store';
 import setLocalStorageAuth from '@/components/auth/actions/setLocalStorageAuth';
+import { IUser } from '@/models/interfaces';
 
 export async function getUserDoc() {
   try {
@@ -8,7 +8,7 @@ export async function getUserDoc() {
     if (!uid) return null;
 
     const db = getFirestore();
-    const usersRef = collection(db, 'user_profiles');
+    const usersRef = collection(db, 'userProfile');
     return doc(usersRef, uid);
   } catch (error) {
     console.log(error);
