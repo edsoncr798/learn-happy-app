@@ -3,28 +3,72 @@ import profileStore from '@/components/auth/profile/profile.store';
 import { IGame } from '@/models/interfaces';
 import getGames from '@/components/games/actions/getGames';
 import { toastController } from '@ionic/vue';
-import getLevelById from '@/components/gameLevels/actions/getLevelById';
-
+// import getLevelById from '@/components/gameLevels/actions/getLevelById';
+import gamesStore from '@/components/games/games.store';
 
 const route = useRoute();
 const router = useRouter();
 
 const userName = computed(() => profileStore.getUserName());
-const levelId = route.params.levelId as string;
+// const levelId = route.params.levelId as string;
 const levelNumber = ref<number | null>(null);
-const games = ref<IGame[]>([]);
+const games = computed(() => gamesStore.getGames());
 
-onMounted(async () => {
-  games.value = await getGames(levelId);
-  console.log('juegos obtenidos', games.value);
 
-  const level = await getLevelById(levelId);
-  if (level) {
-    levelNumber.value = level.levelNumber;
-    console.log('nivel actual', levelNumber.value);
-  }
 
-});
+const loadGames = async (newLevelId: string) => {
+  const localGamesKey = `games_${newLevelId}`; // Clave única para cada nivel en localStorage
+  // const localGames = localStorage.getItem(localGamesKey);
+  localStorage.getItem(localGamesKey);
+
+  // if (localGames) {
+  //   // Si existen datos en localStorage, los usamos
+  //   const gamesFromLocalStorage = JSON.parse(localGames);
+  //   gamesStore.setGames(gamesFromLocalStorage);
+  //   console.log('Cargado desde localStorage:', gamesFromLocalStorage);
+  // } else {
+    // Si no existen datos, hacemos la petición a Firebase
+    const gameData = await getGames(newLevelId);
+    gamesStore.setGames(gameData);
+    console.log('Cargado desde Firebase:', gameData);
+
+    // Guardamos una copia en localStorage
+    localStorage.setItem(localGamesKey, JSON.stringify(gameData));
+  // }
+};
+
+// const unlockGame = (gameId: string) => {
+//   // Obtener los juegos actuales
+//   const currentGames = gamesStore.getGames();
+//
+//   // Modificar el juego específico a desbloqueado
+//   const updatedGames = currentGames.map((game) => {
+//     if (game.uid === gameId) {
+//       return { ...game, unlocked: true };
+//     }
+//     return game;
+//   });
+//
+//   // Guardar en el store
+//   gamesStore.setGames(updatedGames);
+//
+//   // Actualizar el localStorage con los juegos modificados
+//   const localGamesKey = `games_${route.params.levelId}`;
+//   localStorage.setItem(localGamesKey, JSON.stringify(updatedGames));
+//
+//   console.log('Juego desbloqueado y guardado en localStorage:', updatedGames);
+// };
+
+
+
+watch(
+  () => route.params.levelId,
+  async (newLevelId) => {
+    const levelIdAsString = Array.isArray(newLevelId) ? newLevelId[0] : String(newLevelId);
+    await loadGames(levelIdAsString);
+  },
+  { immediate: true }
+);
 
 
 const goToGame = async (game: IGame) => {
@@ -61,15 +105,15 @@ const goToBack = () => {
       <div class="btn-games-container">
         <ion-button
           fill="clear"
-          v-for="(game, index) in games" :key="game.uid"
+          v-for="game in games" :key="game.uid"
           :style="{
         backgroundColor: game.unlocked ? 'red' : 'gray'
       }"
-          :class="`game-${index + 1}`"
+          :class="`game-${game.gameNumber}`"
           class="bg-[#FF0000FF] w-[90px] h-[90px] rounded-[50%] text-[30px] text-white font-black"
           @click="goToGame(game)"
         >
-          {{ index + 1 }}
+          {{ game.gameNumber }}
         </ion-button>
 
       </div>

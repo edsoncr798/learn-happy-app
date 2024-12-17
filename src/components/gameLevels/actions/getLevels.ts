@@ -1,7 +1,6 @@
 import { collection, getDocs, getFirestore } from 'firebase/firestore';
 import { ILevel } from '@/models/interfaces';
 import gameLevelsStore from '@/components/gameLevels/gameLevels.store';
-import { data } from 'autoprefixer';
 
 export default async function getLevels(): Promise<ILevel[] | any> {
   try {

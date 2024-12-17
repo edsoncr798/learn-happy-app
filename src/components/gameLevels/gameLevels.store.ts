@@ -5,16 +5,24 @@ const state = reactive({
 });
 
 const getters = {
-  getLevels(){
-    return state.levels;
-  }
+  getLevels: () => state.levels,
 };
 
 
 const mutations = {
-  setLevels(levels: ILevel[]){
+  setLevels: (levels: ILevel[])=> {
     state.levels = levels;
+  },
+
+  unlockedNextLevel: (currentLevelId: string) => {
+    const currentLevelIndex = state.levels.findIndex(
+      (i) => i.uid === currentLevelId
+    );
+    if(currentLevelIndex !== -1 && currentLevelIndex < state.levels.length -1) {
+      state.levels[currentLevelIndex + 1].is_unlocked = true;
+    }
   }
+
 }
 
 

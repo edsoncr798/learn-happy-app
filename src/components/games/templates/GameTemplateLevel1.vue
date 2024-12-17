@@ -2,15 +2,17 @@
 import { IGame } from '@/models/interfaces';
 import pencil from '@/assets/SVG/paint-brush-art-symbol-free-vector-removebg-preview 1.svg';
 import profileStore from '@/components/auth/profile/profile.store';
-import {
-  completeGame,
-  loadGame,
-  updateGameState,
-} from '@/components/games/actions/progressActions';
+import { loadProgress, saveProgress, } from '@/components/games/actions/progressActions';
+import gamesStore from '@/components/games/games.store';
+import gameLevelsStore from '@/components/gameLevels/gameLevels.store';
 
 
 const router = useRouter();
 const route = useRoute();
+const showModal1 = ref(false);
+const showModal2 = ref(false);
+
+const message = ref('');
 const userId = computed(() => profileStore.getUser().uid);
 const user = ref();
 const levelId = route.params.levelId as string;
@@ -18,33 +20,51 @@ const gameId = route.params.gameId as string;
 const game = ref<IGame | null>(null);
 const currentGame = ref({ levelId: levelId, gameId: gameId }); //juego actual
 
-onMounted(async () => {
-  const gameData = localStorage.getItem('selectedGame'); // Recuperar datos del juego
-  if (gameData) {
-    game.value = JSON.parse(gameData); // Convertir el string a objeto
-  } else {
-    console.error('No se encontraron datos del juego en LocalStorage');
-  }
+//git de niños felices
+ // https://i.pinimg.com/originals/55/fb/44/55fb44dcbbec789f6edad27a058e1e55.gif
 
+onMounted(async () => {
   //cargamos el progreso del usuario
   user.value = profileStore.getUser();
+  const progress = await loadProgress(userId.value);
 
-  //cargamos el estado del juego
-  const isPainted = await loadGame(
-    userId.value,
-    currentGame.value.levelId,
-    currentGame.value.gameId,
-  );
+  //restauramos el estado de los juegos desbloqueados
+  const isUnlocked = progress?.[currentGame.value.levelId]?.[currentGame.value.gameId]?.completed;
 
-  if (isPainted) {
-    const targetElement = document.getElementById('colorable-image');
-    const targetColor = game.value?.colors[0] ?? 'transparent';
-    if (targetElement) {
-      targetElement.style.backgroundColor = targetColor;
+  if (isUnlocked) {
+    message.value = '¡Juego ya completado!';
+  } else {
+    const gameData = localStorage.getItem('selectedGame');  // Recuperar datos del juego
+    if (gameData) {
+      game.value = JSON.parse(gameData); // Convertir el string a objeto
+    } else {
+      console.error('No se encontraron datos del juego en LocalStorage');
     }
   }
-
 });
+
+
+//funcion para completar el juego
+const completeGame = async (gameId: string, levelId: string) => {
+  gamesStore.updateGames(gameId, { completed: true });
+
+  // Guardar progreso en Firebase y LocalStorage
+  await saveProgress(userId.value, currentGame.value.levelId, currentGame.value.gameId);
+
+  // Verificar si es el último juego del nivel
+  const isLastGame = gamesStore.getGames().every((game) => game.completed);
+  if (isLastGame) {
+    gameLevelsStore.unlockedNextLevel(levelId);
+    message.value = '¡Has completado el nivel! Se ha desbloqueado el siguiente nivel.';
+  } else {
+    gamesStore.unlockNextGame();
+    message.value = '¡Buen trabajo! Se ha desbloqueado el siguiente juego.';
+  }
+
+  setTimeout(() => {
+    showModal1.value = true;
+  }, 1000);
+};
 
 const exit = async () => {
   await router.push({
@@ -54,49 +74,55 @@ const exit = async () => {
 
 
 const handleDragStart = (event: DragEvent, color: string) => {
-  event.dataTransfer?.setData('text/plain', color); // Guarda el color que se arrastra
-};
+  event.dataTransfer?.setData('text/plain', color);
+}
 
 const handleDrop = async (event: DragEvent) => {
   event.preventDefault();
-  const draggedColor = event.dataTransfer?.getData('text/plain'); // Obtiene el color
-  const targetColor = game.value?.colors[0]; // Color correcto desde el juego
-  if (!targetColor) return;
+  const draggedColor = event.dataTransfer?.getData('text/plain');
+  const targetColor = game.value?.colors[0]; //color correcto desde el juego
+  if(!targetColor) return;
 
-  if (draggedColor === targetColor) {
-    //pinta el color correcto
+  if(draggedColor === targetColor){
     const targetElement = event.target as HTMLElement;
     targetElement.style.backgroundColor = targetColor;
 
-    // Actualizar progreso y desbloquear el siguiente juego
-    const successProgress = await completeGame(
-      user.value,
-      currentGame.value.levelId,
-      currentGame.value.gameId,
-    );
-
-    if (successProgress) {
-      const nextGameId = await updateGameState(
-        currentGame.value.levelId,
-        currentGame.value.gameId,
-      );
-
-      if (nextGameId) {
-        alert('¡Nivel completado y siguiente juego desbloqueado!');
-        currentGame.value.gameId = nextGameId;// Avanzar al siguiente juego usando su UID
-      } else {
-        alert('¡Nivel completado! No hay más juegos en este nivel.');
-      }
-    }
+    //Completar el juego y guardar el progreso
+    await completeGame(currentGame.value.gameId, currentGame.value.levelId);
   } else {
-    alert('¡Color incorrecto! Inténtalo de nuevo.');
+    message.value='No te preocupes puedes volver a intentarlo';
+    showModal2.value = true;
   }
+}
+
+
+const goToNextLevel = async () => {
+  showModal1.value = false; // Cierra el modal
+  await router.push({
+    name: 'LevelsGames', // Regresa a la vista de los niveles o juegos
+  });
+};
+
+const tryAgain = async () => {
+  showModal2.value = false;
 };
 
 </script>
 
 <template>
   <ion-content>
+    <congratulations-modal
+      :is-open="showModal1"
+      :message="message"
+      @close="() => (showModal1 = false)"
+      @goToNextLevel="goToNextLevel"
+    />
+    <failed-modal
+      :is-open="showModal2"
+      :message="message"
+      @close="() => (showModal2 = false)"
+      @tryAgain="tryAgain"
+    />
     <div class="w-full  text-center h-full relative">
       <ion-header class="text-left bg-[#16BC00] p-2 text-[20px]">
         ¡Empecemos! 00,0 seg

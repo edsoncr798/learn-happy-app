@@ -14,12 +14,14 @@ const isLoading = ref(false);
 
 const requestData = async () => {
   isLoading.value = true;
-  await getLevels();
+  const levelData = await getLevels();
+  gameLevelsStore.setLevels(levelData);
   isLoading.value = false;
-}
+
+};
 
 onMounted(async () => {
-   await requestData();
+  await requestData();
 });
 
 
@@ -47,7 +49,7 @@ const goToBack = () => {
 </script>
 
 <template>
- <game-levels-skeleton v-if="isLoading"/>
+  <game-levels-skeleton v-if="isLoading" />
   <ion-content v-else>
     <div class="w-full h-full flex flex-col justify-between items-center background-container relative">
       <ion-img :src="img_learning" class="w-[200px]" />

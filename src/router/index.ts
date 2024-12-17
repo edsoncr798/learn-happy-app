@@ -17,7 +17,7 @@ const routes: Array<RouteRecordRaw> = [
     path: '/welcome',
     name: 'Welcome',
     component: () => import('@/views/WelcomePage.vue'),
-    meta: {noAuth: false, },
+    meta: { noAuth: false },
   },
   {
     path: '/initial-data',
@@ -49,13 +49,13 @@ const routes: Array<RouteRecordRaw> = [
     path: '/level/:levelId',
     name: 'LevelsGames',
     component: LevelGames,
-    props: true,
+    props: true
   },
   {
     path: '/level/:levelId/game/:gameId',
     name: 'Games',
     component: Games,
-  }
+  },
 ];
 
 const router = createRouter({

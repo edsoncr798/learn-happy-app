@@ -6,19 +6,27 @@ const state = reactive({
 });
 
 const getters = {
-  getGames() {
-    return state.games;
-  },
-
-  getGameById(gameId: string){
-    return state.games.find((game) => game.uid === gameId) || null;
-  }
+  getGames: () => state.games,
 }
 
 const mutations = {
-  setGames(games: IGame[]) {
+  setGames: (games: IGame[]) =>{
     state.games = games;
   },
+
+  updateGames: (gameId: string, updates: Partial<IGame>) =>{
+    const game = state.games.find(
+      (g) => g.uid === gameId
+    );
+    if(game){
+      Object.assign(game, updates);
+    }
+  },
+
+  unlockNextGame: () =>{
+    const nextGame = state.games.find((game) => !game.completed);
+    if(nextGame) nextGame.unlocked = true;
+  }
 };
 
 
