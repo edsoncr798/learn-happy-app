@@ -10,8 +10,15 @@ import GameLevelsSkeleton from '@/components/gameLevels/gameLevelsSkeleton.vue';
 import profileStore from '@/components/auth/profile/profile.store';
 
 const router = useRouter();
-const levels = computed(() => gameLevelsStore.getLevels());
-const userLevels = computed(() => profileStore.getUserProgressLevels())
+const levels = computed(() => {
+  const levels = gameLevelsStore.getLevels();
+  
+  return levels.map((level) => {
+    level.is_unlocked = isLevelUnlocked(level);
+    return level;
+  });
+});
+const userLevels = computed(() => profileStore.getUserProgressLevels());
 const isLoading = ref(false);
 
 const requestData = async () => {
@@ -19,13 +26,11 @@ const requestData = async () => {
   const levelData = await getLevels();
   gameLevelsStore.setLevels(levelData);
   isLoading.value = false;
-
 };
 
 onMounted(async () => {
   await requestData();
 });
-
 
 const goToLevelGames = async (level: ILevel) => {
   if (isLevelUnlocked(level)) {
@@ -45,12 +50,11 @@ const goToLevelGames = async (level: ILevel) => {
 };
 
 const isLevelUnlocked = (level: ILevel) => {
-  if(userLevels.value.length === 0 && level.levelNumber === 1) {
+  if (userLevels.value.length === 0 && level.levelNumber === 1) {
     return true;
   }
   return userLevels.value.find((item) => item === level.uid) != null;
-}
-
+};
 
 const goToBack = () => {
   router.push({ name: 'Home' });
@@ -60,7 +64,9 @@ const goToBack = () => {
 <template>
   <game-levels-skeleton v-if="isLoading" />
   <ion-content v-else>
-    <div class="w-full h-full flex flex-col justify-between items-center background-container relative">
+    <div
+      class="w-full h-full flex flex-col justify-between items-center background-container relative"
+    >
       <ion-img :src="img_learning" class="w-[200px]" />
       <div class="grid -mt-8 grid-cols-2 px-8 w-full grid-flow-row">
         <ion-card
@@ -75,11 +81,14 @@ const goToBack = () => {
             }"
             class="text-center text-black"
           >
-            Nivel <br>
+            Nivel <br />
             {{ level.levelNumber }}
           </div>
-          <ion-img v-if="!isLevelUnlocked(level)" :src="lock_closed"
-                   class="w-1/2 absolute left-[50%] -translate-x-1/2 -translate-y-1/2 top-1/2" />
+          <ion-img
+            v-if="!isLevelUnlocked(level)"
+            :src="lock_closed"
+            class="w-1/2 absolute left-[50%] -translate-x-1/2 -translate-y-1/2 top-1/2"
+          />
         </ion-card>
       </div>
       <ion-img :src="img_palms" class="w-[50px]" />
@@ -95,6 +104,4 @@ const goToBack = () => {
   </ion-content>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

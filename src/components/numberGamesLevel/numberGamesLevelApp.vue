@@ -4,23 +4,34 @@ import { IGame } from '@/models/interfaces';
 import getGames from '@/components/games/actions/getGames';
 import gamesStore from '@/components/games/games.store';
 import { toastController } from '@ionic/vue';
+import GameButton from '@/components/numberGamesLevel/gameButton.vue';
 
 const route = useRoute();
 const router = useRouter();
 
-
 const userName = computed(() => profileStore.getUserName());
 const levelId = route.params.levelId as string;
-// const levelNumber = ref<number | null>(null);
-const games = computed(() => gamesStore.getGames());
+const games = computed(() => {
+  const games = gamesStore.getGames();
+  const userGames = profileStore.getUserGamesCompletedByLevel2(levelId) || [];
+
+  return games.map((game: IGame, index) => {
+    game.completed =
+      userGames.findIndex((userGame) => userGame === game.uid) !== -1;
+
+    game.unlocked = game.completed;
+    if (index > 0) {
+      game.unlocked = games[index - 1].completed;
+    }
+    return game;
+  });
+});
 const completedGames = ref<number>(0);
 
 onMounted(async () => {
   completedGames.value = profileStore.getUserCompletedGamesByLevel(levelId);
-  console.log('numberGamesLevelApp', completedGames.value);
   await getGames(levelId);
 });
-
 
 const goToGame = async (game: IGame) => {
   if (game.unlocked) {
@@ -40,33 +51,28 @@ const goToGame = async (game: IGame) => {
   }
 };
 
-
 const goToBack = () => {
   router.push({ name: 'Levels' });
 };
-
 </script>
 
 <template>
   <ion-content>
     <div class="background-levels w-full h-full relative">
-      <ion-card color="success" class="font-mono font-black w-[60%] absolute top-0 left-0 p-2 text-xl">
+      <ion-card
+        color="success"
+        class="font-mono font-black w-[60%] absolute top-0 left-0 p-2 text-xl"
+      >
         Jugador: {{ userName }}
       </ion-card>
       <div class="btn-games-container">
-        <ion-button
-          fill="clear"
-          v-for="(game, index) in games" :key="game.uid"
-          :style="{
-        backgroundColor: game.unlocked || index < completedGames ? 'red' : 'gray'
-      }"
-          :class="`game-${game.gameNumber}`"
-          class="bg-[#FF0000FF] w-[90px] h-[90px] rounded-[50%] text-[30px] text-white font-black"
-          @click="goToGame(game)"
-        >
-          {{ game.gameNumber }}
-        </ion-button>
-
+        <game-button
+          v-for="(game, index) in games"
+          :key="game.uid"
+          :game="game"
+          :index="index"
+          @goToGame="goToGame"
+        />
       </div>
     </div>
     <ion-button
@@ -81,7 +87,7 @@ const goToBack = () => {
 
 <style scoped>
 .background-levels {
-  background-image: url("@/assets/SVG/walkingLevels.svg");
+  background-image: url('@/assets/SVG/walkingLevels.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
@@ -102,7 +108,6 @@ const goToBack = () => {
   flex-direction: column;
   scroll-behavior: smooth; /* Transiciones suaves al hacer scroll */
 }
-
 
 .game-1 {
   align-self: end;
@@ -215,5 +220,15 @@ const goToBack = () => {
   grid-column: 2;
 }
 
+.bg-unlocked {
+  background-color: red;
+}
 
+.bg-locked {
+  background-color: gray;
+}
+
+.bg-completed {
+  background-color: green;
+}
 </style>
