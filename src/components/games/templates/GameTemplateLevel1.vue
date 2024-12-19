@@ -54,6 +54,7 @@ const completeGame = async (gameId: string, levelId: string) => {
   // Verificar si es el último juego del nivel
   const isLastGame = gamesStore.getGames().every((game) => game.completed);
   console.log(isLastGame);
+
   if (isLastGame) {
 
     const currentLevel = gameLevelsStore.getLevels().find((level) => level.uid === levelId);
