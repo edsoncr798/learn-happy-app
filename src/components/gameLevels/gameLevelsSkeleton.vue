@@ -18,7 +18,7 @@ import lock_closed from '@/assets/SVG/unlocked.svg';
           >
             <div class="skeleton-box" style="width: 100px; height: 20px;"></div>
           </div>
-          <ion-img  :src="lock_closed"
+          <ion-img
                    class="w-1/2 absolute lef" />
         </ion-card>
       </div>
@@ -34,7 +34,7 @@ import lock_closed from '@/assets/SVG/unlocked.svg';
 
 <style scoped>
 .skeleton-box {
-  background-color: #e0e0e0;
+  background-color: #655f5f;
   border-radius: 4px;
   animation: pulse 1.5s infinite ease-in-out;
 }

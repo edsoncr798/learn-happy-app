@@ -7,9 +7,11 @@ import { ILevel } from '@/models/interfaces';
 import gameLevelsStore from '@/components/gameLevels/gameLevels.store';
 import getLevels from '@/components/gameLevels/actions/getLevels';
 import GameLevelsSkeleton from '@/components/gameLevels/gameLevelsSkeleton.vue';
+import profileStore from '@/components/auth/profile/profile.store';
 
 const router = useRouter();
 const levels = computed(() => gameLevelsStore.getLevels());
+const userLevels = computed(() => profileStore.getUserProgressLevels())
 const isLoading = ref(false);
 
 const requestData = async () => {
@@ -26,7 +28,7 @@ onMounted(async () => {
 
 
 const goToLevelGames = async (level: ILevel) => {
-  if (level.is_unlocked) {
+  if (isLevelUnlocked(level)) {
     await router.push({
       name: 'LevelsGames',
       params: { levelId: level.uid },
@@ -41,6 +43,13 @@ const goToLevelGames = async (level: ILevel) => {
       .then((toast) => toast.present());
   }
 };
+
+const isLevelUnlocked = (level: ILevel) => {
+  if(userLevels.value.length === 0 && level.levelNumber === 1) {
+    return true;
+  }
+  return userLevels.value.find((item) => item === level.uid) != null;
+}
 
 
 const goToBack = () => {
@@ -62,14 +71,14 @@ const goToBack = () => {
         >
           <div
             :class="{
-              'blur-[2px] cursor-not-allowed': !level.is_unlocked,
+              'blur-[2px] cursor-not-allowed': !isLevelUnlocked(level),
             }"
             class="text-center text-black"
           >
             Nivel <br>
             {{ level.levelNumber }}
           </div>
-          <ion-img v-if="!level.is_unlocked" :src="lock_closed"
+          <ion-img v-if="!isLevelUnlocked(level)" :src="lock_closed"
                    class="w-1/2 absolute left-[50%] -translate-x-1/2 -translate-y-1/2 top-1/2" />
         </ion-card>
       </div>

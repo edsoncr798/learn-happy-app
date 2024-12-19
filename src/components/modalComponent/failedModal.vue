@@ -16,7 +16,7 @@ defineEmits(['close', 'tryAgain']);
         <ion-title class="text-[35px] font-mono font-black" color="success">¡Oh no fallaste!</ion-title>
         <p class="text-green-500 font-black">{{ message }}</p>
         <ion-img class="animate-bounce w-3/4 mt-20 mx-auto" :src="sad" alt="imagen" />
-        <ion-button @click="$emit('tryAgain')" class="absolute right-0 bottom-0 mr-5 mb-5">Intentar</ion-button>
+        <ion-button @click="$emit('tryAgain')" class="absolute right-0 bottom-0 mr-5 mb-5">Reintentar</ion-button>
       </div>
     </ion-content>
   </ion-modal>

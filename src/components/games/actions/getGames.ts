@@ -3,7 +3,7 @@ import { collection, getDocs, getFirestore, query, where } from 'firebase/firest
 import gamesStore from '@/components/games/games.store';
 
 
-export default async function getGames(levelId: string): Promise<IGame[] | any> {
+export default async function getGames(levelId: string): Promise<IGame[]> {
 
   try {
     const db = getFirestore();
@@ -19,15 +19,15 @@ export default async function getGames(levelId: string): Promise<IGame[] | any> 
       const data = doc.data();
       return {
         uid: doc.id,
-        gameNumber: data.gameNumber,
-        level_id: data.level_id,
-        unlocked: data.unlocked,
-        description: data.description,
-        completed: data.completed,
-        colors: data.colors,
-        images: data.images,
-        created_at: data.created_at,
-        updated_at: data.updated_at,
+        gameNumber: data.gameNumber ?? 0, // Valor por defecto
+        level_id: data.level_id ?? '',
+        unlocked: data.unlocked ?? false,
+        description: data.description ?? '',
+        completed: data.completed ?? false,
+        colors: data.colors ?? [],
+        images: data.images ?? [],
+        created_at: data.created_at ?? null,
+        updated_at: data.updated_at ?? null,
       } as IGame;
     });
 
@@ -35,8 +35,8 @@ export default async function getGames(levelId: string): Promise<IGame[] | any> 
     games.sort((a, b) => a.gameNumber - b.gameNumber);
     gamesStore.setGames(games);
     return games;
-  } catch (error) {
-    console.error('Error al obtener los juegos', error);
-    throw new Error('No se pudieron obtener los juegos');
+  } catch (error: any) {
+    console.error(`Error al obtener juegos del nivel ${levelId}:`, error.message || error);
+    throw new Error('Error al obtener los juegos. Verifica tu conexión o los permisos de Firestore.');
   }
 }

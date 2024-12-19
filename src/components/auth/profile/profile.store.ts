@@ -1,4 +1,4 @@
-import { IUser } from '@/models/interfaces';
+import { IUser, IUserProgress } from '@/models/interfaces';
 
 
 const state = reactive({
@@ -13,8 +13,14 @@ const getters = {
     return `${user.name}`;
   },
 
-  getUserProgress(){
-    return state.user.progress;
+  getUserProgressLevels(){
+    if(!state.user.progress)return [];
+    return Object.keys(state.user.progress);
+  },
+
+  getUserCompletedGamesByLevel:(levelId: string) => {
+    if(!state.user.progress)return 0;
+    return  state.user.progress[levelId]?.completedGames;
   }
 }
 
@@ -23,8 +29,8 @@ const actions = {
     state.user = user;
   },
 
-  setUserProgress:(user: IUser) => {
-    state.user.progress = user.progress;
+  setUserProgress:(progress: IUserProgress) => {
+    state.user.progress = progress;
   },
 
   unlockedNextGame(levelId: string, currentGameId: string){

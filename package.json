@@ -21,6 +21,7 @@
     "@firebasegen/default-connector": "file:dataconnect-generated/js/default-connector",
     "@ionic/vue": "^8.0.0",
     "@ionic/vue-router": "^8.0.0",
+    "apexcharts": "^4.2.0",
     "element-plus": "^2.8.8",
     "firebase": "^11.0.2",
     "ionicons": "^7.0.0",

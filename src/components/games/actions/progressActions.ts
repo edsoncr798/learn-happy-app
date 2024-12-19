@@ -1,9 +1,11 @@
 import { doc, getDoc, getFirestore, setDoc } from 'firebase/firestore';
+import profileStore from '@/components/auth/profile/profile.store';
 
 
 // Guarda el progreso del juego
 export async function saveProgress(userId: string, levelId: string, gameId: string) {
   const db = getFirestore();
+  console.log('entramos');
   const userProgressKey = 'userProgress';
 
   // Cargar progreso existente desde localStorage
@@ -35,8 +37,11 @@ export async function saveProgress(userId: string, levelId: string, gameId: stri
       { merge: true },
     );
 
+
+
     // Guardar progreso en localStorage
     localStorage.setItem(userProgressKey, JSON.stringify(localProgress));
+    profileStore.setUserProgress(localProgress);
     console.log('Progreso guardado con éxito:', localProgress);
 
     return true;
@@ -56,8 +61,11 @@ export async function loadProgress(userId: string) {
   const localProgress = localStorage.getItem(userProgressKey);
 
   if (localProgress) {
-    console.log('Progreso cargado desde localStorage');
-    return JSON.parse(localProgress);
+    console.log('Progreso cargado desde localStorage', localProgress);
+    const progress = JSON.parse(localProgress);
+    console.log('progreso:', progress);
+    profileStore.setUserProgress(progress)
+    return progress;
   }
 
   try {
@@ -71,6 +79,7 @@ export async function loadProgress(userId: string) {
 
       // Guardar progreso en localStorage
       localStorage.setItem(userProgressKey, JSON.stringify(progress));
+      profileStore.setUserProgress(progress);
       console.log('Progreso cargado desde Firebase:', progress);
       return progress;
     }

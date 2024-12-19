@@ -2,7 +2,7 @@
 import { IGame } from '@/models/interfaces';
 import pencil from '@/assets/SVG/paint-brush-art-symbol-free-vector-removebg-preview 1.svg';
 import profileStore from '@/components/auth/profile/profile.store';
-import { loadProgress, saveProgress, } from '@/components/games/actions/progressActions';
+import { loadProgress, saveProgress } from '@/components/games/actions/progressActions';
 import gamesStore from '@/components/games/games.store';
 import gameLevelsStore from '@/components/gameLevels/gameLevels.store';
 
@@ -21,7 +21,7 @@ const game = ref<IGame | null>(null);
 const currentGame = ref({ levelId: levelId, gameId: gameId }); //juego actual
 
 //git de niños felices
- // https://i.pinimg.com/originals/55/fb/44/55fb44dcbbec789f6edad27a058e1e55.gif
+// https://i.pinimg.com/originals/55/fb/44/55fb44dcbbec789f6edad27a058e1e55.gif
 
 onMounted(async () => {
   //cargamos el progreso del usuario
@@ -34,7 +34,7 @@ onMounted(async () => {
   if (isUnlocked) {
     message.value = '¡Juego ya completado!';
   } else {
-    const gameData = localStorage.getItem('selectedGame');  // Recuperar datos del juego
+    const gameData = localStorage.getItem('games');  // Recuperar datos del juego
     if (gameData) {
       game.value = JSON.parse(gameData); // Convertir el string a objeto
     } else {
@@ -53,17 +53,23 @@ const completeGame = async (gameId: string, levelId: string) => {
 
   // Verificar si es el último juego del nivel
   const isLastGame = gamesStore.getGames().every((game) => game.completed);
+  console.log(isLastGame);
   if (isLastGame) {
-    gameLevelsStore.unlockedNextLevel(levelId);
+
+    const currentLevel = gameLevelsStore.getLevels().find((level) => level.uid === levelId);
+    if (!currentLevel)return;
+    const nextLevel = gameLevelsStore.getLevels().find((level) => level.levelNumber === currentLevel?.levelNumber+1);
+    if (!nextLevel)return;
+    gameLevelsStore.unlockedNextLevel(nextLevel?.uid);
     message.value = '¡Has completado el nivel! Se ha desbloqueado el siguiente nivel.';
   } else {
     gamesStore.unlockNextGame();
     message.value = '¡Buen trabajo! Se ha desbloqueado el siguiente juego.';
   }
-
+  // localStorage.setItem('games', JSON.stringify(game));
   setTimeout(() => {
     showModal1.value = true;
-  }, 1000);
+  }, 500);
 };
 
 const exit = async () => {
@@ -75,25 +81,25 @@ const exit = async () => {
 
 const handleDragStart = (event: DragEvent, color: string) => {
   event.dataTransfer?.setData('text/plain', color);
-}
+};
 
 const handleDrop = async (event: DragEvent) => {
   event.preventDefault();
   const draggedColor = event.dataTransfer?.getData('text/plain');
   const targetColor = game.value?.colors[0]; //color correcto desde el juego
-  if(!targetColor) return;
+  if (!targetColor) return;
 
-  if(draggedColor === targetColor){
+  if (draggedColor === targetColor) {
     const targetElement = event.target as HTMLElement;
     targetElement.style.backgroundColor = targetColor;
 
     //Completar el juego y guardar el progreso
     await completeGame(currentGame.value.gameId, currentGame.value.levelId);
   } else {
-    message.value='No te preocupes puedes volver a intentarlo';
+    message.value = 'No te preocupes puedes volver a intentarlo';
     showModal2.value = true;
   }
-}
+};
 
 
 const goToNextLevel = async () => {
@@ -125,7 +131,7 @@ const tryAgain = async () => {
     />
     <div class="w-full  text-center h-full relative">
       <ion-header class="text-left bg-[#16BC00] p-2 text-[20px]">
-        ¡Empecemos! 00,0 seg
+        ¡Empecemos!
       </ion-header>
       <span class="absolute text-[30px] left-0 font-black font-mono">{{ game?.description }}</span>
       <div
