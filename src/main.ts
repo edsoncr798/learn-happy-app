@@ -1,6 +1,7 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router';
+import VueApexCharts from "vue3-apexcharts";
 
 import { IonicVue } from '@ionic/vue';
 
@@ -36,8 +37,10 @@ import './theme/style.css';
 import './modules/firebaseConfig'
 
 const app = createApp(App)
+  .use(VueApexCharts)
   .use(IonicVue)
   .use(router);
+
 
 router.isReady().then(() => {
   app.mount('#app');

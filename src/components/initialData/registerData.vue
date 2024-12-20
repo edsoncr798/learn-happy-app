@@ -89,7 +89,6 @@ const saveInitialData = async () => {
                 <ion-button
                   size="large"
                   expand="full"
-                  aria-selected="true"
                   fill="default"
                   class="border-2 border-[#1461eb]"
                   @click="selectGender('Niño')"
@@ -100,7 +99,6 @@ const saveInitialData = async () => {
                 <ion-button
                   size="large"
                   expand="full"
-                  aria-selected="true"
                   fill="default"
                   class="border-2 border-[#1461eb]"
                   @click="selectGender('Niña')"
@@ -129,5 +127,8 @@ const saveInitialData = async () => {
 </template>
 
 <style scoped>
+.selected{
+  background-color: darkblue;
+}
 
 </style>
