@@ -1,30 +1,29 @@
 import { doc, getDoc, getFirestore, setDoc } from 'firebase/firestore';
 import profileStore from '@/components/auth/profile/profile.store';
 import gameLevelsStore from '@/components/gameLevels/gameLevels.store';
-import GameLevelsStore from '@/components/gameLevels/gameLevels.store';
 import gamesStore from '@/components/games/games.store';
 
-// Guarda el progreso del juego
 export async function saveProgress(
   userId: string,
   levelId: string,
   gameId: string,
   isLastGame: boolean = false,
 ) {
-  const db = getFirestore();
+
   const levels = gameLevelsStore.getLevels();
-  console.log('entramos');
   const userProgressKey = 'userProgress';
 
-  // Cargar progreso existente desde localStorage
   const localProgress = JSON.parse(
     localStorage.getItem(userProgressKey) || '{}',
   );
 
-  // Actualizar progreso local
   if (!localProgress[levelId]) {
     localProgress[levelId] = { completedGames: 0, games: {} };
   }
+
+  console.log("localProgress", localProgress);
+  console.log("levelId", levelId);
+  console.log("gameId", gameId);
 
   if (!localProgress[levelId].games[gameId]) {
     localProgress[levelId].games[gameId] = { isPainted: true };
@@ -32,7 +31,7 @@ export async function saveProgress(
   }
 
   try {
-    // Guardar progreso en Firestore
+    const db = getFirestore();
     const userDocRef = doc(db, 'userProfile', userId);
     await setDoc(
       userDocRef,
@@ -127,7 +126,6 @@ export async function loadProgress(userId: string) {
   const db = getFirestore();
   const userProgressKey = 'userProgress';
 
-  // Intentar cargar progreso desde localStorage
   const localProgress = localStorage.getItem(userProgressKey);
 
   if (localProgress) {

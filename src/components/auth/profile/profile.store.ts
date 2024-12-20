@@ -17,6 +17,18 @@ const getters = {
     return Object.keys(state.user.progress);
   },
 
+  getUserProgressGames() {
+    if (!state.user.progress) return [];
+
+    const levels = Object.keys(state.user.progress);
+    const games = levels.map((level) => {
+      if (!state.user.progress) return [];
+
+      return Object.keys(state.user.progress[level].games);
+    });
+    return games.flat();
+  },
+
   getUserCompletedGamesByLevel: (levelId: string) => {
     if (!state.user.progress) return 0;
     if (!state.user.progress[levelId]) return 0;
