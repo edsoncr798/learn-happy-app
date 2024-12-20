@@ -121,7 +121,7 @@ const tryAgain = async() => {
     />
     <div class="w-full  text-center h-full relative">
       <ion-header class="text-left bg-[#16BC00] p-2 text-[20px]">
-        ¡Empecemos! 00,0 seg
+        ¡Empecemos! 00,0 seg - soy el template 2
       </ion-header>
       <span class="absolute text-[30px] left-0 font-black font-mono">{{ game?.description }}</span>
       <div
@@ -139,21 +139,6 @@ const tryAgain = async() => {
           alt="dibujo" />
       </div>
 
-      <div
-        class="w-full bg-gray-100 py-4 border-2 flex items-center justify-around border-gray-500 absolute bottom-0 mb-14">
-        <ion-img :src="pencil" class="w-[90px]" alt="pencil" />
-        <ion-button
-          fill="clear"
-          v-for="(color, i) in game?.colors"
-          :key="i"
-          class="w-[90px] h-[90px] rounded-[50%]"
-          :style="{
-        backgroundColor: color}"
-          :draggable="game?.completed ? 'false' : 'true'"
-          @dragstart="handleDragStart($event, color)"
-        >
-        </ion-button>
-      </div>
       <ion-button @click="exit" fill="clear" class="absolute rounded-sm bottom-0 mb-2 right-0 mr-5 bg-[#C9F6F5]">Salir
       </ion-button>
     </div>

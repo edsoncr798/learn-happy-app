@@ -11,6 +11,7 @@ const router = useRouter();
 const route = useRoute();
 const showModal1 = ref(false);
 const showModal2 = ref(false);
+const thisIsLastGame = ref(false);
 const message = ref('');
 const userId = computed(() => profileStore.getUser().uid);
 const user = ref();
@@ -51,6 +52,7 @@ const completeGame = async (gameId: string, levelId: string) => {
   const isLastGame = gamesStore.getGames().every((game) => game.completed);
   if (isLastGame) {
     gameLevelsStore.unlockedNextLevel(levelId);
+    thisIsLastGame.value = true;
     message.value = '¡Has completado el nivel! Se ha desbloqueado el siguiente nivel.';
   } else {
     gamesStore.unlockNextGame();
@@ -93,10 +95,17 @@ const handleDrop = async (event: DragEvent) => {
 
 
 const goToNextLevel = async () => {
-  showModal1.value = false; // Cierra el modal
-  await router.push({
-    name: 'LevelsGames', // Regresa a la vista de los niveles o juegos
-  });
+  if(!thisIsLastGame.value) {
+    showModal1.value = false; // Cierra el modal
+    await router.push({
+      name: 'LevelsGames', // Regresa a la vista de los niveles o juegos
+    });
+  } else {
+    showModal1.value = false; // Cierra el modal
+    await router.push({
+      name: 'Levels', // Regresa a la vista de los niveles o juegos
+    });
+  }
 };
 
 const tryAgain = async() => {
