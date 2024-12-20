@@ -52,7 +52,7 @@ const actions = {
   },
 
   setUserProgress: (progress: IUserProgress) => {
-    state.user.progress = progress;
+    state.user.progress = Object.assign({}, progress);
   },
 
   unlockedNextGame(levelId: string, currentGameId: string) {
