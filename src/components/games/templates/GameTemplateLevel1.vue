@@ -172,7 +172,7 @@ const tryAgain = async () => {
           :style="{
             backgroundColor: color,
           }"
-          :draggable="game?.completed ? 'false' : 'true'"
+          :draggable="true"
           @dragstart="handleDragStart($event, color)"
         >
         </ion-button>

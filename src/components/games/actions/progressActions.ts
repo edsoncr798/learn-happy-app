@@ -1,6 +1,8 @@
 import { doc, getDoc, getFirestore, setDoc } from 'firebase/firestore';
 import profileStore from '@/components/auth/profile/profile.store';
 import gameLevelsStore from '@/components/gameLevels/gameLevels.store';
+import GameLevelsStore from '@/components/gameLevels/gameLevels.store';
+import gamesStore from '@/components/games/games.store';
 
 // Guarda el progreso del juego
 export async function saveProgress(
@@ -69,7 +71,25 @@ export async function saveProgress(
       const nextLevelId = nextLevel.uid;
 
       if (!localProgress[nextLevelId]) {
-        localProgress[nextLevelId] = { completedGames: 0, games: {} };
+        const first_game = gamesStore
+          .getGames()
+          .find(
+            (game) => game.level_id === nextLevelId && game.gameNumber === 1,
+          );
+        if (!first_game) {
+          console.error(
+            'No se encontró el primer juego del siguiente nivel:',
+            nextLevelId,
+          );
+          return false;
+        }
+
+        localProgress[nextLevelId] = {
+          completedGames: 0,
+          games: {
+            [first_game.uid]: { isPainted: false },
+          },
+        };
 
         // Guardar progreso en Firestore
         await setDoc(
@@ -78,7 +98,9 @@ export async function saveProgress(
             progress: {
               [nextLevelId]: {
                 completedGames: localProgress[nextLevelId].completedGames,
-                games: {},
+                games: {
+                  [first_game.uid]: { isPainted: false },
+                },
               },
             },
           },
@@ -86,7 +108,7 @@ export async function saveProgress(
         );
 
         console.log('Nuevo nivel desbloqueado:', nextLevelId);
-        
+
         // Guardar progreso en localStorage
         localStorage.setItem(userProgressKey, JSON.stringify(localProgress));
         profileStore.setUserProgress(localProgress);
