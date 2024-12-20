@@ -5,41 +5,9 @@ import lock_closed from '@/assets/SVG/unlocked.svg';
 import { toastController } from '@ionic/vue';
 import { ILevel } from '@/models/interfaces';
 import gameLevelsStore from '@/components/gameLevels/gameLevels.store';
-import getLevels from '@/components/gameLevels/actions/getLevels';
-import GameLevelsSkeleton from '@/components/gameLevels/gameLevelsSkeleton.vue';
-import getGames from '@/components/games/actions/getGames';
-import gamesStore from '@/components/games/games.store';
 
 const router = useRouter();
-const route = useRoute();
 const levels = computed(() => gameLevelsStore.getLevels());
-const isLoading = ref(false);
-
-const requestData = async () => {
-  isLoading.value = true;
-  const levelData = await getLevels();
-  gameLevelsStore.setLevels(levelData);
-  isLoading.value = false;
-
-};
-
-onMounted(async () => {
-  await requestData();
-});
-
-
-watch(
-  () => route.params.levelId,
-  async (newLevelId) => {
-    const levelIdAsString = Array.isArray(newLevelId) ? newLevelId[0] : String(newLevelId);
-    isLoading.value = true;
-    const levelGames = await getGames(levelIdAsString)
-    isLoading.value = false;
-    gamesStore.setGames(levelGames);
-  },
-  { immediate: true },
-);
-
 
 const goToLevelGames = async (level: ILevel) => {
   if (level.is_unlocked) {
@@ -58,16 +26,16 @@ const goToLevelGames = async (level: ILevel) => {
   }
 };
 
-
 const goToBack = () => {
   router.push({ name: 'Home' });
 };
 </script>
 
 <template>
-  <game-levels-skeleton v-if="isLoading" />
-  <ion-content v-else>
-    <div class="w-full h-full flex flex-col justify-between items-center background-container relative">
+  <ion-content>
+    <div
+      class="w-full h-full flex flex-col justify-between items-center background-container relative"
+    >
       <ion-img :src="img_learning" class="w-[200px]" />
       <div class="grid -mt-8 grid-cols-2 px-8 w-full grid-flow-row">
         <ion-card
@@ -82,11 +50,14 @@ const goToBack = () => {
             }"
             class="text-center text-black"
           >
-            Nivel <br>
+            Nivel <br />
             {{ level.levelNumber }}
           </div>
-          <ion-img v-if="!level.is_unlocked" :src="lock_closed"
-                   class="w-1/2 absolute left-[50%] -translate-x-1/2 -translate-y-1/2 top-1/2" />
+          <ion-img
+            v-if="!level.is_unlocked"
+            :src="lock_closed"
+            class="w-1/2 absolute left-[50%] -translate-x-1/2 -translate-y-1/2 top-1/2"
+          />
         </ion-card>
       </div>
       <ion-img :src="img_palms" class="w-[50px]" />
@@ -102,6 +73,4 @@ const goToBack = () => {
   </ion-content>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

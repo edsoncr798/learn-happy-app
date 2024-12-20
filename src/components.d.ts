@@ -10,6 +10,8 @@ declare module 'vue' {
     AppHeader: typeof import('./components/AppHeader.vue')['default']
     CongratulationsModal: typeof import('./components/modalComponent/congratulationsModal.vue')['default']
     FailedModal: typeof import('./components/modalComponent/failedModal.vue')['default']
+    GameButton: typeof import('./components/numberGamesLevel/gameButton.vue')['default']
+    GameCard: typeof import('./components/numberGamesLevel/GameCard.vue')['default']
     GameLevelsSkeleton: typeof import('./components/gameLevels/gameLevelsSkeleton.vue')['default']
     GamesLevelsApp: typeof import('./components/gameLevels/gamesLevelsApp.vue')['default']
     GameTemplateLevel1: typeof import('./components/games/templates/GameTemplateLevel1.vue')['default']

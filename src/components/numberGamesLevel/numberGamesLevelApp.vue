@@ -3,17 +3,13 @@ import profileStore from '@/components/auth/profile/profile.store';
 import { IGame } from '@/models/interfaces';
 import getGames from '@/components/games/actions/getGames';
 import { toastController } from '@ionic/vue';
-// import getLevelById from '@/components/gameLevels/actions/getLevelById';
 import gamesStore from '@/components/games/games.store';
 
 const route = useRoute();
 const router = useRouter();
 
 const userName = computed(() => profileStore.getUserName());
-const levelId = route.params.levelId as string;
-const levelNumber = ref<number | null>(null);
 const games = computed(() => gamesStore.getGames());
-
 
 const loadGames = async (newLevelId: string) => {
   const localGamesKey = `games_${newLevelId}`; // Clave única para cada nivel en localStorage
@@ -35,17 +31,6 @@ const loadGames = async (newLevelId: string) => {
   }
 };
 
-
-watch(
-  () => route.params.levelId,
-  async (newLevelId) => {
-    const levelIdAsString = Array.isArray(newLevelId) ? newLevelId[0] : String(newLevelId);
-    await loadGames(levelIdAsString);
-  },
-  { immediate: true },
-);
-
-
 const goToGame = async (game: IGame) => {
   if (game.unlocked) {
     localStorage.setItem('selectedGame', JSON.stringify(game));
@@ -64,33 +49,38 @@ const goToGame = async (game: IGame) => {
   }
 };
 
-
 const goToBack = () => {
   router.push({ name: 'Levels' });
 };
-
 </script>
 
 <template>
   <ion-content>
     <div class="background-levels w-full h-full relative">
-      <ion-card color="success" class="font-mono font-black w-[60%] absolute top-0 left-0 p-2 text-xl">
+      <ion-card
+        color="success"
+        class="font-mono font-black w-[60%] absolute top-0 left-0 p-2 text-xl"
+      >
         Jugador: {{ userName }}
       </ion-card>
       <div class="btn-games-container">
         <ion-button
           fill="clear"
-          v-for="game in games" :key="game.uid"
-          :style="{
-        backgroundColor: game.unlocked ? 'red' : 'gray'
-      }"
-          :class="`game-${game.gameNumber}`"
+          v-for="game in games"
+          :key="game.uid"
+          :class="[
+            `game-${game.gameNumber}`,
+            {
+              'game-unlocker': game.unlocked && !game.completed,
+              'game-complete': game.completed,
+              'game-locked': !game.unlocked,
+            },
+          ]"
           class="bg-[#FF0000FF] w-[90px] h-[90px] rounded-[50%] text-[30px] text-white font-black"
           @click="goToGame(game)"
         >
           {{ game.gameNumber }}
         </ion-button>
-
       </div>
     </div>
     <ion-button
@@ -105,7 +95,7 @@ const goToBack = () => {
 
 <style scoped>
 .background-levels {
-  background-image: url("@/assets/SVG/walkingLevels.svg");
+  background-image: url('@/assets/SVG/walkingLevels.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
@@ -126,7 +116,6 @@ const goToBack = () => {
   flex-direction: column;
   scroll-behavior: smooth; /* Transiciones suaves al hacer scroll */
 }
-
 
 .game-1 {
   align-self: end;
@@ -239,5 +228,15 @@ const goToBack = () => {
   grid-column: 2;
 }
 
+.game-unlocker {
+  background-color: red;
+}
 
+.game-complete {
+  background-color: green;
+}
+
+.game-locked {
+  background-color: gray;
+}
 </style>

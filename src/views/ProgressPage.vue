@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import ApexCharts from 'apexcharts';
 import { loadProgress } from '@/components/games/actions/progressActions';
 import profileStore from '@/components/auth/profile/profile.store';
 import userProgressStore from '@/components/userProgress/userProgress.store';

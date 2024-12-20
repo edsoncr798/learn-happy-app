@@ -50,6 +50,7 @@ const completeGame = async (gameId: string, levelId: string) => {
 
   // Verificar si es el último juego del nivel
   const isLastGame = gamesStore.getGames().every((game) => game.completed);
+  console.log("isLastGame", isLastGame);
   if (isLastGame) {
     gameLevelsStore.unlockedNextLevel(levelId);
     thisIsLastGame.value = true;
@@ -158,7 +159,7 @@ const tryAgain = async() => {
           class="w-[90px] h-[90px] rounded-[50%]"
           :style="{
         backgroundColor: color}"
-          :draggable="game?.completed ? 'false' : 'true'"
+          draggable="true"
           @dragstart="handleDragStart($event, color)"
         >
         </ion-button>
