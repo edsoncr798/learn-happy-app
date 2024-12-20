@@ -1,39 +1,18 @@
 <script setup lang="ts">
 import profileStore from '@/components/auth/profile/profile.store';
 import { IGame } from '@/models/interfaces';
-import getGames from '@/components/games/actions/getGames';
 import { toastController } from '@ionic/vue';
 import gamesStore from '@/components/games/games.store';
 
-const route = useRoute();
 const router = useRouter();
 
 const userName = computed(() => profileStore.getUserName());
 const games = computed(() => gamesStore.getGames());
 
-const loadGames = async (newLevelId: string) => {
-  const localGamesKey = `games_${newLevelId}`; // Clave única para cada nivel en localStorage
-  const localGames = localStorage.getItem(localGamesKey);
-
-  if (localGames) {
-    // Si existen datos en localStorage, los usamos
-    const gamesFromLocalStorage = JSON.parse(localGames);
-    gamesStore.setGames(gamesFromLocalStorage);
-    console.log('Cargado desde localStorage:', gamesFromLocalStorage);
-  } else {
-    // Si no existen datos, hacemos la petición a Firebase
-    const gameData = await getGames(newLevelId);
-    gamesStore.setGames(gameData);
-    console.log('Cargado desde Firebase:', gameData);
-
-    // Guardamos una copia en localStorage
-    localStorage.setItem(localGamesKey, JSON.stringify(gameData));
-  }
-};
-
 const goToGame = async (game: IGame) => {
   if (game.unlocked) {
     localStorage.setItem('selectedGame', JSON.stringify(game));
+    gamesStore.setSelectedGame(game);
     await router.push({
       name: 'Games',
       params: { gameId: game.uid },
