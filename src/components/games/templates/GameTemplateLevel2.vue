@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { IGame } from '@/models/interfaces';
-import pencil from '@/assets/SVG/paint-brush-art-symbol-free-vector-removebg-preview 1.svg';
 import profileStore from '@/components/auth/profile/profile.store';
 import { loadProgress, saveProgress, } from '@/components/games/actions/progressActions';
 import gamesStore from '@/components/games/games.store';

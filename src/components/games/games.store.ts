@@ -3,10 +3,12 @@ import { IGame } from '@/models/interfaces';
 
 const state = reactive({
   games: [] as IGame[],
+  thisIsLastGame: false,
 });
 
 const getters = {
   getGames: () => state.games,
+  getThisIsLastGame: () => state.thisIsLastGame,
 }
 
 const mutations = {
