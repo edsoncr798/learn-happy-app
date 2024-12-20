@@ -2,6 +2,7 @@
 import { loadProgress } from '@/components/games/actions/progressActions';
 import profileStore from '@/components/auth/profile/profile.store';
 import userProgressStore from '@/components/userProgress/userProgress.store';
+import router from '@/router';
 
 const userId = computed(() => profileStore.getUser().uid);
 const progressData = computed(() => userProgressStore.getProgress());
@@ -63,19 +64,29 @@ onMounted(async () => {
   isLoading.value = false;
 });
 
-console.log('progreso del usurio: ', userId.value, ' Progresos:', progressData.value);
+const goToBack = () => {
+  router.push({name: 'Home'});
+}
+
 
 </script>
 
 <template>
   <ion-page>
     <ion-content>
-      <div class="background-container w-full h-full">
-        <ion-title>Progreso del usuario</ion-title>
+      <div class="background-container w-full h-full relative">
+        <ion-title class="text-center font-mono font-extrabold text-[20px] pt-4">Progreso del usuario</ion-title>
 
         <div id="chart">
           <apexchart type="bar" height="350" :options="chartOptions" :series="series"></apexchart>
         </div>
+        <ion-button
+          fill="clear"
+          class="absolute bg-[#C9F6F5] right-0 bottom-0 mr-4 mb-4"
+          @click="goToBack"
+        >
+          Regresar
+        </ion-button>
       </div>
     </ion-content>
   </ion-page>

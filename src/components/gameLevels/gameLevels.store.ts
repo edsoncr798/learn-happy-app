@@ -6,6 +6,7 @@ const state = reactive({
 
 const getters = {
   getLevels: () => state.levels,
+  getNumberOfLevels: () => state.levels.length,
 };
 
 
