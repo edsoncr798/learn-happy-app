@@ -2,40 +2,53 @@
 import profileStore from '@/components/auth/profile/profile.store';
 import { IGame } from '@/models/interfaces';
 import getGames from '@/components/games/actions/getGames';
-import gamesStore from '@/components/games/games.store';
 import { toastController } from '@ionic/vue';
-import GameButton from '@/components/numberGamesLevel/gameButton.vue';
+// import getLevelById from '@/components/gameLevels/actions/getLevelById';
+import gamesStore from '@/components/games/games.store';
 
 const route = useRoute();
 const router = useRouter();
 
 const userName = computed(() => profileStore.getUserName());
 const levelId = route.params.levelId as string;
-const games = computed(() => {
-  const games = gamesStore.getGames();
-  const userGames = profileStore.getUserGamesCompletedByLevel2(levelId) || [];
+const levelNumber = ref<number | null>(null);
+const games = computed(() => gamesStore.getGames());
 
-  return games.map((game: IGame, index) => {
-    game.completed =
-      userGames.findIndex((userGame) => userGame === game.uid) !== -1;
 
-    game.unlocked = game.completed;
-    if (index > 0) {
-      game.unlocked = games[index - 1].completed;
-    }
-    return game;
-  });
-});
-const completedGames = ref<number>(0);
+const loadGames = async (newLevelId: string) => {
+  const localGamesKey = `games_${newLevelId}`; // Clave única para cada nivel en localStorage
+  const localGames = localStorage.getItem(localGamesKey);
 
-onMounted(async () => {
-  completedGames.value = profileStore.getUserCompletedGamesByLevel(levelId);
-  await getGames(levelId);
-});
+  if (localGames) {
+    // Si existen datos en localStorage, los usamos
+    const gamesFromLocalStorage = JSON.parse(localGames);
+    gamesStore.setGames(gamesFromLocalStorage);
+    console.log('Cargado desde localStorage:', gamesFromLocalStorage);
+  } else {
+    // Si no existen datos, hacemos la petición a Firebase
+    const gameData = await getGames(newLevelId);
+    gamesStore.setGames(gameData);
+    console.log('Cargado desde Firebase:', gameData);
+
+    // Guardamos una copia en localStorage
+    localStorage.setItem(localGamesKey, JSON.stringify(gameData));
+  }
+};
+
+
+watch(
+  () => route.params.levelId,
+  async (newLevelId) => {
+    const levelIdAsString = Array.isArray(newLevelId) ? newLevelId[0] : String(newLevelId);
+    await loadGames(levelIdAsString);
+  },
+  { immediate: true },
+);
+
 
 const goToGame = async (game: IGame) => {
   if (game.unlocked) {
-    localStorage.setItem('games', JSON.stringify(game));
+    localStorage.setItem('selectedGame', JSON.stringify(game));
     await router.push({
       name: 'Games',
       params: { gameId: game.uid },
@@ -51,28 +64,33 @@ const goToGame = async (game: IGame) => {
   }
 };
 
+
 const goToBack = () => {
   router.push({ name: 'Levels' });
 };
+
 </script>
 
 <template>
   <ion-content>
     <div class="background-levels w-full h-full relative">
-      <ion-card
-        color="success"
-        class="font-mono font-black w-[60%] absolute top-0 left-0 p-2 text-xl"
-      >
+      <ion-card color="success" class="font-mono font-black w-[60%] absolute top-0 left-0 p-2 text-xl">
         Jugador: {{ userName }}
       </ion-card>
       <div class="btn-games-container">
-        <game-button
-          v-for="(game, index) in games"
-          :key="game.uid"
-          :game="game"
-          :index="index"
-          @goToGame="goToGame"
-        />
+        <ion-button
+          fill="clear"
+          v-for="game in games" :key="game.uid"
+          :style="{
+        backgroundColor: game.unlocked ? 'red' : 'gray'
+      }"
+          :class="`game-${game.gameNumber}`"
+          class="bg-[#FF0000FF] w-[90px] h-[90px] rounded-[50%] text-[30px] text-white font-black"
+          @click="goToGame(game)"
+        >
+          {{ game.gameNumber }}
+        </ion-button>
+
       </div>
     </div>
     <ion-button
@@ -87,7 +105,7 @@ const goToBack = () => {
 
 <style scoped>
 .background-levels {
-  background-image: url('@/assets/SVG/walkingLevels.svg');
+  background-image: url("@/assets/SVG/walkingLevels.svg");
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
@@ -108,6 +126,7 @@ const goToBack = () => {
   flex-direction: column;
   scroll-behavior: smooth; /* Transiciones suaves al hacer scroll */
 }
+
 
 .game-1 {
   align-self: end;
@@ -220,15 +239,5 @@ const goToBack = () => {
   grid-column: 2;
 }
 
-.bg-unlocked {
-  background-color: red;
-}
 
-.bg-locked {
-  background-color: gray;
-}
-
-.bg-completed {
-  background-color: green;
-}
 </style>
